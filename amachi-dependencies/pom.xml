@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!--
+      Pure BOM (Bill of Materials) of the Amachi ecosystem: dependency versions only, no build configuration.
+      - Inherited through amachi-parent (recommended): versions can be overridden with the properties below.
+      - Imported (<scope>import</scope>) by a project that must keep another parent.
+      Same role as spring-boot-dependencies.
+    -->
+    <groupId>com.amachi</groupId>
+    <artifactId>amachi-dependencies</artifactId>
+    <version>2.1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <name>Amachi Dependencies</name>
+    <description>
+        Bill of Materials of the Amachi ecosystem: Spring Boot 4.1, Spring Cloud 2025.1, Spring AI 2.0, JUnit 6,
+        Cucumber 8, plus the libraries Spring Boot does not manage.
+    </description>
+    <url>https://github.com/tuma01/amachi-bom</url>
+
+    <scm>
+        <url>https://github.com/tuma01/amachi-bom</url>
+        <connection>scm:git:https://github.com/tuma01/amachi-bom.git</connection>
+        <developerConnection>scm:git:https://github.com/tuma01/amachi-bom.git</developerConnection>
+        <tag>HEAD</tag>
+    </scm>
+
+    <!--
+      VERSIONING RULES
+      - One line per Spring Boot minor line: 2.1.x = Boot 4.1.x. A published version is never edited in place.
+      - Never pin a library that spring-boot-dependencies already manages (check its pom first):
+        a local pin silently downgrades it on the next Boot upgrade.
+    -->
+    <properties>
+        <!-- Platforms (imported BOMs) -->
+        <org.springframework.boot.version>4.1.2</org.springframework.boot.version>
+        <!-- 2025.1.x supports Boot 4.1 starting with 2025.1.2 -->
+        <spring-cloud.version>2025.1.4</spring-cloud.version>
+        <!-- Spring AI 2.0.x targets Boot 4.0/4.1 -->
+        <spring-ai.version>2.0.2</spring-ai.version>
+        <!--
+          JUnit is imported BEFORE Spring Boot (first import wins) to align the whole test platform with
+          Cucumber 8, which is built on JUnit Platform 6.1. Boot 4.1.2 ships 6.0.3; 6.1 is a compatible minor.
+          Remove this override when Spring Boot ships JUnit 6.1 or later.
+        -->
+        <junit.version>6.1.3</junit.version>
+        <cucumber.version>8.0.4</cucumber.version>
+
+        <!-- API contract (springdoc 3.2.0 is built on Boot 4.1.2 and swagger-core 2.2.55) -->
+        <springdoc.version>3.2.0</springdoc.version>
+        <swagger-annotations.version>2.2.55</swagger-annotations.version>
+
+        <!-- Security -->
+        <jjwt.version>0.13.0</jjwt.version>
+
+        <!-- Code generation (lombok aligned with Boot 4.1.2; the property is used by annotation processor paths) -->
+        <mapstruct.version>1.6.3</mapstruct.version>
+        <lombok.version>1.18.48</lombok.version>
+
+        <!-- Tests not managed by Boot -->
+        <instancio.version>6.1.0</instancio.version>
+        <wiremock.version>3.13.2</wiremock.version>
+        <archunit.version>1.5.1</archunit.version>
+
+        <!-- Static analysis annotations -->
+        <spotbugs-annotations.version>4.10.5</spotbugs-annotations.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+
+            <!-- ===== Imported BOMs: order matters, the first import wins on conflicts ===== -->
+            <dependency>
+                <groupId>org.junit</groupId>
+                <artifactId>junit-bom</artifactId>
+                <version>${junit.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <!-- Spring Framework, Hibernate, Jackson, Flyway, MySQL driver, Mockito, AssertJ, Testcontainers… -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${org.springframework.boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.ai</groupId>
+                <artifactId>spring-ai-bom</artifactId>
+                <version>${spring-ai.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.cucumber</groupId>
+                <artifactId>cucumber-bom</artifactId>
+                <version>${cucumber.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- ===== API contract ===== -->
+            <dependency>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+                <version>${springdoc.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-starter-webmvc-api</artifactId>
+                <version>${springdoc.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.swagger.core.v3</groupId>
+                <artifactId>swagger-annotations</artifactId>
+                <version>${swagger-annotations.version}</version>
+            </dependency>
+
+            <!-- ===== Security ===== -->
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt-api</artifactId>
+                <version>${jjwt.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt-impl</artifactId>
+                <version>${jjwt.version}</version>
+                <scope>runtime</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt-jackson</artifactId>
+                <version>${jjwt.version}</version>
+                <scope>runtime</scope>
+            </dependency>
+
+            <!-- ===== Code generation ===== -->
+            <dependency>
+                <groupId>org.mapstruct</groupId>
+                <artifactId>mapstruct</artifactId>
+                <version>${mapstruct.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mapstruct</groupId>
+                <artifactId>mapstruct-processor</artifactId>
+                <version>${mapstruct.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${lombok.version}</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <!-- ===== Tests (JUnit, Mockito, AssertJ, Awaitility and Testcontainers come from Boot) ===== -->
+            <dependency>
+                <groupId>org.instancio</groupId>
+                <artifactId>instancio-core</artifactId>
+                <version>${instancio.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.instancio</groupId>
+                <artifactId>instancio-junit</artifactId>
+                <version>${instancio.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.wiremock</groupId>
+                <artifactId>wiremock-standalone</artifactId>
+                <version>${wiremock.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.tngtech.archunit</groupId>
+                <artifactId>archunit</artifactId>
+                <version>${archunit.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <!-- JUnit 6 integration (archunit-junit5 targets the JUnit 5 platform) -->
+            <dependency>
+                <groupId>com.tngtech.archunit</groupId>
+                <artifactId>archunit-junit6</artifactId>
+                <version>${archunit.version}</version>
+                <scope>test</scope>
+            </dependency>
+
+            <!-- ===== Static analysis ===== -->
+            <dependency>
+                <groupId>com.github.spotbugs</groupId>
+                <artifactId>spotbugs-annotations</artifactId>
+                <version>${spotbugs-annotations.version}</version>
+                <scope>provided</scope>
+            </dependency>
+
+        </dependencies>
+    </dependencyManagement>
+
+</project>
